@@ -1,0 +1,12 @@
+{
+    "extends": "@repo/typescript-config/base.json",
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "module": "nodenext",
+        "target": "esnext",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true, // optional, but nice to include
+        "types": []
+    }
+}

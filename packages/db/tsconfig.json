@@ -1,0 +1,19 @@
+{
+    "extends": "@repo/typescript-config/base.json", // if you use a shared config
+    "compilerOptions": {
+        "rootDir": ".", // IMPORTANT: covers src + generated
+        "outDir": "dist",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "target": "esnext",
+        "declaration": true,
+        "declarationMap": true,
+        "composite": true,
+        "esModuleInterop": true,
+        "strict": true
+    },
+    "include": [
+        "src",
+        "generated"
+    ] // so prisma client TS also gets compiled
+}
