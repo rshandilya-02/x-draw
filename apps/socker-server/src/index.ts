@@ -36,12 +36,18 @@ const server = createServer(app);
 
 
 
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:3000", // your frontend
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
 
 io.on('connection', (socket) => {
     console.log('a user is connected');
     
-    console.log('socket check', socket.handshake);
+    // console.log('socket check', socket.handshake);
     console.log(socket.handshake.query.token);
     if (!socket.handshake.query.token) {
         socket.disconnect();
@@ -53,19 +59,29 @@ io.on('connection', (socket) => {
         socket.disconnect();
         return;
     };
-
-    socket.on('message', async(msg) => {
+    console.log('ready');
+    socket.on('message', async (rawMsg) => {
+        let msg = rawMsg;
+        if (typeof rawMsg === 'string') {
+            try {
+                msg = JSON.parse(rawMsg);
+            } catch (e) {
+                console.error('Failed to parse message JSON:', e);
+                return;
+            }
+        }
         console.log("message is ", msg);
-        msg = JSON.parse(msg);
+        // msg = JSON.parse(msg);
         if (!msg) return; 
         console.log('ready to join join-room',msg.type);
         if (msg.type === 'join-room') {
             console.log('inside join-room');
             const user = users.find((user) => user.userId === userId);
-            console.log('check user ', user);
+            socket.join(msg.roomId);
+            console.log('check user ', user?.userId);
             if (!msg.roomId) return;
             if (user) {
-                console.log('user do exist ', user);
+                console.log('user do exist ', user.userId,' ',user.rooms);
                 if (user.rooms.includes(msg.roomId)) {
                     return;
                 } else {
@@ -88,6 +104,7 @@ io.on('connection', (socket) => {
             if (user.rooms.includes(msg.roomId)) {
                 user.rooms = user.rooms.filter(r => r !== msg.roomId);
             };
+            socket.leave(msg.roomId);
             console.log('users ', user);
             console.log('room leaving done');
         }
@@ -101,7 +118,7 @@ io.on('connection', (socket) => {
             await chatQueue.add('store-chat', {
                 roomId, message, userId
             });
-
+            console.log('inside chat');
             //chat addition to db
             // const chat_store = await prisma.chat.create({
             //     data: {
@@ -112,8 +129,12 @@ io.on('connection', (socket) => {
             // });
 
             users.forEach((user) => {
+                console.log('this is user ', user.userId);
+                console.log('this is roomId', roomId);
                 if (user.rooms.includes(roomId)) { 
-                    socket.emit(roomId, {
+                    console.log('seding boy now to ', user.userId);
+
+                    user.socket.emit(roomId, {
                         type: "chat",
                         roomId: roomId,
                         message:message
