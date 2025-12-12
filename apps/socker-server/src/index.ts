@@ -19,7 +19,7 @@ const users: User[] = [];
 
 function vaidateUser(token: string):string | null {
     try {
-        console.log('token ', token);
+        // console.log('token ', token);
         const decoded = jwt.verify(token, JWT_SECRET);
         console.log('decoded ', decoded);
         if(!decoded)
@@ -38,7 +38,7 @@ const server = createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000", // your frontend
+        origin: "http://localhost:3001", // your frontend
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -48,13 +48,13 @@ io.on('connection', (socket) => {
     console.log('a user is connected');
     
     // console.log('socket check', socket.handshake);
-    console.log(socket.handshake.query.token);
+    // console.log(socket.handshake.query.token);
     if (!socket.handshake.query.token) {
         socket.disconnect();
     }
     const token:string = socket.handshake.query.token as string;
     const userId = vaidateUser(token);
-    console.log('user Id', userId);
+    // console.log('user Id', userId);
     if (!userId) {
         socket.disconnect();
         return;
@@ -78,9 +78,10 @@ io.on('connection', (socket) => {
             console.log('inside join-room');
             const user = users.find((user) => user.userId === userId);
             socket.join(msg.roomId);
-            console.log('check user ', user?.userId);
+            // console.log('check user ', user?.userId);
             if (!msg.roomId) return;
             if (user) {
+                user.socket = socket;
                 console.log('user do exist ', user.userId,' ',user.rooms);
                 if (user.rooms.includes(msg.roomId)) {
                     return;
@@ -105,13 +106,13 @@ io.on('connection', (socket) => {
                 user.rooms = user.rooms.filter(r => r !== msg.roomId);
             };
             socket.leave(msg.roomId);
-            console.log('users ', user);
+            // console.log('users ', user);
             console.log('room leaving done');
         }
 
         if (msg.type === 'chat') {
             const roomId = msg.roomId;
-            const message = msg.message; 
+            const message = JSON.stringify(msg.payload); 
 
             //push data into the queue 
 
@@ -133,7 +134,8 @@ io.on('connection', (socket) => {
                 console.log('this is roomId', roomId);
                 if (user.rooms.includes(roomId)) { 
                     console.log('seding boy now to ', user.userId);
-
+                    console.log('chat emitting to rromId ', roomId);
+                    console.log('user socket id ', user.socket.id);
                     user.socket.emit(roomId, {
                         type: "chat",
                         roomId: roomId,
