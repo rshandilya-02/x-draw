@@ -45,7 +45,7 @@ const RoomChat = ({ roomId }: { roomId: string }) => {
 
           RoomChat {JSON.stringify(roomId)}
           {message && message.length>0 && message.map((item,index) => {
-              return <div key={index}>{item.message}</div>
+              return <div key={index}>{JSON.stringify(item)}</div>
           })}
           
       </div>

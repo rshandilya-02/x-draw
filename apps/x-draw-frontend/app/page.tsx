@@ -293,7 +293,7 @@ const Home = () => {
 };
 
 // Helper Components for cleaner code
-const FeatureCard = ({ icon, title, desc }) => (
+const FeatureCard = ({ icon, title, desc }:{icon:React.ReactNode,title:string,desc:string}) => (
   <div className="p-6 rounded-xl bg-zinc-900/20 border border-zinc-800 hover:border-emerald-500/30 hover:bg-zinc-900/40 transition-all group">
     <div className="mb-4 bg-zinc-900 p-3 rounded-lg w-fit group-hover:bg-emerald-500/10 transition-colors">
       {icon}
@@ -303,7 +303,7 @@ const FeatureCard = ({ icon, title, desc }) => (
   </div>
 );
 
-const TestimonialCard = ({ quote, author, role }) => (
+const TestimonialCard = ({ quote, author, role }:{quote:string,author:string,role:string}) => (
   <div className="p-6 rounded-xl bg-zinc-900/20 border border-zinc-800 flex flex-col justify-between">
     <p className="text-gray-300 italic mb-6">"{quote}"</p>
     <div className="flex items-center gap-3">
