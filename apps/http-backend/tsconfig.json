@@ -9,5 +9,6 @@
         "allowSyntheticDefaultImports": true, // optional, but nice to include
         "types": [],
         "composite": true
-    }
+    },
+    "include": ["src"]
 }
